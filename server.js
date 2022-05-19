@@ -13,15 +13,14 @@ app.get('/', (request, response) => {
   response.send(`Weather Data API`);
 })
 
-app.get('/location', async (request, response, next) => {
+app.get('/location', async (req, res, next) => {
   try {
-    let urlUS = `${process.env.LOCATION_IQ_US_BASE_URL}?key=${process.env.LOCATION_IQ_API_KEY}&q=${city}&format=json`;
-    let urlEU = `${process.env.LOCATION_IQ_EU_BASE_URL}?key=${process.env.LOCATION_IQ_API_KEY}&q=${city}&format=json`;
+    let urlUS = `${process.env.LOCATION_IQ_US_BASE_URL}?key=${process.env.LOCATION_IQ_API_KEY}&q=${req.query.city}&format=json`;
+    let urlEU = `${process.env.LOCATION_IQ_EU_BASE_URL}?key=${process.env.LOCATION_IQ_API_KEY}&q=${req.query.city}&format=json`;
     let results = await axios.get(urlUS) ? await axios.get(urlUS) : await axios.get(urlEU);
     let locations = results.map(result => {return new Location(result)});
-    response.send(locations);
     console.log(results);
-    response.send(locations)
+    res.send(locations)
   } catch (err) {
     console.log(Object.entries(err));
     next(err);
@@ -30,8 +29,7 @@ app.get('/location', async (request, response, next) => {
 
 app.get('/weather', async (req, res, next) => {
   try {
-    let city = req.query.city;
-    let url = `${process.env.WEATHER_API_BASE_URL}?key=${process.env.WEATHER_API_KEY}&city=${city}&units=I`;
+    let url = `${process.env.WEATHER_API_BASE_URL}?key=${process.env.WEATHER_API_KEY}&city=${req.query.city}&units=I`;
     console.log(req.query.searchQuery);
     console.log(url);
     let results =  await axios.get(url);
@@ -46,13 +44,13 @@ app.get('/weather', async (req, res, next) => {
   }
 })
 
-app.get('*', (request, response) => {
-  response.send('City not found.');
+app.get('*', (req, res) => {
+  res.send('City not found.');
   console.log('City not found');
 })
 
-app.use((error, request, response, next) => {
-  response.status(500).send(error.message);
+app.use((error, req, res, next) => {
+  res.status(500).send(error.message);
   console.log(error.message);
 })
 
