@@ -9,8 +9,9 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
-app.get('/', (request, response) => {
-  response.send(`Weather Data API`);
+app.get('/', (req, res) => {
+  let routes = [{route: 'location'}, {route: 'movies'}, {route: 'weather'}];
+  res.send(routes);
 })
 
 app.get('/location', async (req, res, next) => {
