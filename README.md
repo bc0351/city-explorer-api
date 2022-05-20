@@ -33,4 +33,6 @@ Actual time needed to complete: _____
 
 ## WWRC
 
-No WWRC available.
+[WWRC](./img/WRRC.jpg)
+
+  ** This screenshot is not right. Will get it updated. **
