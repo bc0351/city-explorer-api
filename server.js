@@ -9,18 +9,40 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
-app.get('/', (request, response) => {
-  response.send(`Weather Data API`);
+app.get('/', (req, res) => {
+  let routes = [{route: 'location'}, {route: 'movies'}, {route: 'weather'}];
+  res.send(routes);
 })
 
 app.get('/location', async (req, res, next) => {
   try {
-    let urlUS = `${process.env.LOCATION_IQ_US_BASE_URL}?key=${process.env.LOCATION_IQ_API_KEY}&q=${req.query.city}&format=json`;
-    let urlEU = `${process.env.LOCATION_IQ_EU_BASE_URL}?key=${process.env.LOCATION_IQ_API_KEY}&q=${req.query.city}&format=json`;
+    let city = req.query.city;
+    let urlUS = `${process.env.LOC_IQ_US_BASE_URL}?key=${process.env.LOC_IQ_API_KEY}&city=${city}&format=json`;
+    let urlEU = `${process.env.LOC_IQ_EU_BASE_URL}?key=${process.env.LOC_IQ_API_KEY}&city=${city}&format=json`;
+
     let results = await axios.get(urlUS) ? await axios.get(urlUS) : await axios.get(urlEU);
-    let locations = results.map(result => {return new Location(result)});
     console.log(results);
-    res.send(locations)
+
+    let locations = [];
+
+    results.map(result => {return new Location(result)});
+    res.send(locations);
+
+
+  } catch (err) {
+    console.log(Object.entries(err));
+    next(err);
+  }
+})
+
+app.get('/movies', async (req, res, next) => {
+  try {
+    let url = `${process.env.MOVIE_3_API_BASE_URL}?api_key=${process.env.MOVIE_3_API_KEY}&with_keywords=${req.query.city}&sort_by=popularity.desc&include_adult=false`;
+    console.log(url);
+    let data = (await axios.get(url)).data.results;
+    console.log(data);
+    let movies = data.map(movie => {let m = new Movie(m)});
+    console.log(movies);
   } catch (err) {
     console.log(Object.entries(err));
     next(err);
@@ -29,14 +51,15 @@ app.get('/location', async (req, res, next) => {
 
 app.get('/weather', async (req, res, next) => {
   try {
-    let url = `${process.env.WEATHER_API_BASE_URL}?key=${process.env.WEATHER_API_KEY}&city=${req.query.city}&units=I`;
-    console.log(req.query.searchQuery);
+    let city = req.query.city;
+    let url = `${process.env.WEATHER_API_BASE_URL}?key=${process.env.WEATHER_API_KEY}&city=${city}&units=I`;
+    console.log(req.query.city);
     console.log(url);
     let results =  await axios.get(url);
     console.log(results);
     let forecasts = [];
-    console.log(results.data.data);
-    results.data.data.map(result => {forecasts.push(new Forecast(result))});
+    results.data.data.map((obj, index) => {let forecast = new Forecast(obj); forecasts.push({key: index, data: forecast});});
+    console.log(forecasts);
     res.send(forecasts);
   } catch (err) {
     console.log(Object.entries(err));
@@ -103,10 +126,9 @@ class Forecast {
     this.dhi = forecast.dhi,
     this.aqi = forecast.aqi,
     this.lat = forecast.lat,
-    this.weather = forecast.weather,
-    this.weather.icon = forecast.weather.icon,
-    this.weather.code = forecast.weather.code,
-    this.weather.description = forecast.weather.description,
+    this.weather_icon = forecast.weather.icon,
+    this.weather_code = forecast.weather.code,
+    this.weather_description = forecast.weather.description,
     this.datetime = forecast.datetime,
     this.temp = forecast.temp,
     this.station = forecast.station,
@@ -115,4 +137,16 @@ class Forecast {
   }
 }
 
+class Movie {
+  constructor(movie) {
+    this.id = movie.id,
+    this.title = movie.title,
+    this.overview = movie.overview,
+    this.average_votes = movie.vote_average,
+    this.total_votes = movie.vote_count,
+    this.image_url = `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+    this.popularity = movie.popularity,
+    this.released_on = movie.release_date
+  }
+}
 app.listen(PORT, () => console.log(`listening on post ${PORT}`));
