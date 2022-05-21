@@ -2,23 +2,26 @@
 
 require('dotenv').config();
 
-const axios = require('axios');
-
 const imageUrl = process.env.MOVIE_3_API_IMG_URL;
-const baseUrl = process.env.MOVIE_3_API_BASE_URL;
+const baseURL = process.env.MOVIE_3_API_BASE_URL;
+const apiKey = process.env.MOVIE_3_API_KEY;
 
-function getMovies(req, res, next) {
+const axios = require('axios').default;
+
+async function getMovies(req, res, next) {
   let params = {
-    api_key: process.env.MOVIE_3_API_KEY,
-    with_keywords: req.query.keywords,
+    api_key: apiKey,
+    query: req.query.q,
     sort_by: 'popularity.desc',
     adult: false,
     format: 'json'
-  }
-  axios.get(baseUrl, { params })
-    .then(response => response.data.results.map(movie => { return new Movie(movie) }))
+  };
+
+  return await axios.get(`${baseURL}/search/movie`, { params })
+    .then(response => response.data.results.map(movie => { console.log(`movie.js.line 37: ${movie}`); return new Movie(movie) }))
     .then(filteredMovies => res.status(200).send(filteredMovies))
-    .catch(error => next(error));
+    .catch((error) => {res.status(500).send(error.message); console.log(error.message);});
+
 }
 
 class Movie {

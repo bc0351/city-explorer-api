@@ -2,21 +2,22 @@
 
 require('dotenv').config();
 
-const axios = require('axios');
+const axios = require('axios').default;
 
 const baseUrl = process.env.WEATHER_API_BASE_URL;
-const apiKey = process.env.WEATHER_API_KEY;
 
-function getForecast(req, res, next) {
+async function getMovies(req, res, next) {
   let params = {
-    key: apiKey,
-    lat: req.query.lat,
-    lon: req.query.lon,
-    units: 'I'
-  }
-  axios.get(baseUrl, { params })
-    .then(response => response.data.results.map(forecast => { return new Forecast(forecast) }))
-    .then(filteredCities => res.status(200).send(filteredCities))
+    api_key: process.env.MOVIE_3_API_KEY,
+    with_keywords: req.query.keywords,
+    sort_by: 'popularity.desc',
+    adult: false,
+    format: 'json'
+  };
+  
+  return await axios.get(baseUrl, { params })
+    .then(response => response.data.results.map(movie => { return new Movie(movie) }))
+    .then(filteredMovies => res.status(200).send(filteredMovies))
     .catch(error => next(error));
 }
 
@@ -63,4 +64,5 @@ class Forecast {
   }
 }
 
-module.exports = getForecast;
+
+module.exports = getMovies;

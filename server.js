@@ -11,11 +11,14 @@ const app = express();
 app.use(cors());
 
 const getMovies = require('./modules/movies');
-const getForecast= require('./modules/weather');
+const getForecast= require('./.vscode/weather');
 
 app.get('/', async (req, res, next) => {
-  res.send('City Explorer API')
-    .catch(error => next(error));
+  try {
+    res.send('City Explorer API');
+   } catch (error) {
+    next(error);
+   }
 });
 
 app.get('/movies', getMovies);
@@ -23,8 +26,7 @@ app.get('/movies', getMovies);
 app.get('/weather', getForecast);
 
 app.get('*', (req, res) => {
-  res.send('City not found.');
-  console.log('City not found');
+  res.send('No endpoint selected.');
 })
 
 app.use((error, req, res, next) => {
