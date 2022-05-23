@@ -1,24 +1,39 @@
 'use strict';
+require('dotenv').config('../.env');
 
-require('dotenv').config();
+let cache = require('./cache.js');
+
+module.exports = getMovies;
 
 const axios = require('axios');
 
-const baseUrl = process.env.MOVIE_3_API_BASE_URL;
+function getMovies(query) {
+  const key = `movies-${query}`;
+  const url = `${process.env.MOVIE_3_API_BASE_URL}/search/movie?api_key=${process.env.MOVIE_3_API_KEY}&query=${query}&sort_by=popularity.desc&adult=false&format=json`;
+  
+  console.log(key);
+  console.log(url);
 
-async function getMovies(req, res, next) {
-  let params = {
-    api_key: process.env.MOVIE_3_API_KEY,
-    query: req.query.q,
-    sort_by: 'popularity.desc',
-    adult: false,
-    format: 'json'
+  if(cache[key] && (Date.now() - cache[key].timestamp < 86400000)) {
+    console.log('Cache hit');
+  } else {
+    console.log('Cache miss');
+    cache[key] = {};
+    cache[key].timestamp = Date.now();
+    cache[key].data = axios.get(url)
+    .then(response => parseMovies(response));
   }
+  console.log(cache[key].data);
+  return cache[key].data;
+}
 
-  await axios.get(`${baseUrl}/search/movie`, { params })
-    .then(response => response.data.results.map(movie => {return new Movie(movie)}))
-    .then(movies => res.status(200).send(movies))
-    .catch(error => next(error));
+function parseMovies(movieData) {
+  try {
+    const movieInfo = movieData.data.results.map(movie => {return new Movie(movie)});
+    return Promise.resolve(movieInfo);
+  } catch (err) {
+    return Promise.reject(err);
+  }
 }
 
 class Movie {
@@ -28,11 +43,9 @@ class Movie {
     this.overview = movie.overview,
     this.average_votes = movie.vote_average,
     this.total_votes = movie.vote_count,
-    this.backdrop_img_url = `https://image.tmdb.org/t/p/w300${movie.backdrop_path}`,
-    this.poster_img_url = `https://image.tmdb.org/t/p/w300${movie.poster_path}`,
+    this.backdrop_img_url = (movie.backdrop_path) ? `https://image.tmdb.org/t/p/w300${movie.backdrop_path}` : '',
+    this.poster_img_url = (movie.backdrop_path) ? `https://image.tmdb.org/t/p/w300${movie.poster_path}` : '',
     this.popularity = movie.popularity,
     this.released_on = movie.release_date
   }
 }
-
-module.exports = getMovies;
