@@ -4,7 +4,6 @@ require('dotenv').config();
 
 const axios = require('axios');
 
-const imageUrl = process.env.MOVIE_3_API_IMG_URL;
 const baseUrl = process.env.MOVIE_3_API_BASE_URL;
 
 async function getMovies(req, res, next) {
@@ -16,17 +15,10 @@ async function getMovies(req, res, next) {
     format: 'json'
   }
 
-  console.log(baseUrl);
-  // axios.get(`${baseUrl}/search/movie`, { params })
-  //   .then(response => response.data.data.map(movie => { return new Movie(movie) }))
-  //   .then(filteredMovies => res.status(200).send(filteredMovies))
-  //   .catch(error => next(error));
-
-    await axios.get(`${baseUrl}/search/movie`, { params })
+  await axios.get(`${baseUrl}/search/movie`, { params })
     .then(response => response.data.results.map(movie => {return new Movie(movie)}))
     .then(movies => res.status(200).send(movies))
     .catch(error => next(error));
-
 }
 
 class Movie {
@@ -36,15 +28,10 @@ class Movie {
     this.overview = movie.overview,
     this.average_votes = movie.vote_average,
     this.total_votes = movie.vote_count,
-    this.backdrop_path = movie.backdrop_path,
+    this.backdrop_img_url = `https://image.tmdb.org/t/p/w300${movie.backdrop_path}`,
+    this.poster_img_url = `https://image.tmdb.org/t/p/w300${movie.poster_path}`,
     this.popularity = movie.popularity,
     this.released_on = movie.release_date
-  }
-}
-
-class Poster {
-  constructor(poster) {
-    this.img_url = poser.file_path
   }
 }
 
