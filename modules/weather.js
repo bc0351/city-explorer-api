@@ -1,6 +1,7 @@
 'use strict';
 
-require('dotenv').config();
+require('dotenv').config('../.env');
+require('./cache.js');
 
 const axios = require('axios');
 
