@@ -1,38 +1,25 @@
 # Project Name
 
-**Author**: Your Name Goes Here
-**Version**: 1.0.0 (increment the patch/fix version number if you make more commits past your first submission)
+**Author**: Ben Choe
+**Version**: 0.2.0
 
 ## Overview
-<!-- Provide a high level overview of what this application is and why you are building it, beyond the fact that it's an assignment for this class. (i.e. What's your problem domain?) -->
+When given a city, provides the user with a basic map, weather forecasts, and movies related to the city.
 
 ## Getting Started
-<!-- What are the steps that a user must take in order to build this app on their own machine and get it running? -->
+For this  back-end API server, Node.js, Express, and axios must be installed.
 
 ## Architecture
-<!-- Provide a detailed description of the application design. What technologies (languages, libraries, etc) you're using, and any other relevant design information. -->
+This is a very basic API server.
 
 ## Change Log
-<!-- Use this area to document the iterative changes made to your application as each feature is successfully implemented. Use time stamps. Here's an example:
-
-01-01-2001 4:59pm - Application now has a fully-functional express server, with a GET route for the location resource. -->
+This code went through many changes, though the history has been lost from a repo recreate.
 
 ## Credit and Collaborations
-<!-- Give credit (and a link) to other people or resources that helped you build this application. -->
+- Vinny Shipley
+- Guy Farley
+- Cody Davis
 
-Name of feature: ________________________________
+## WRRC
 
-Estimate of time needed to complete: _____
-
-Start time: _____
-
-Finish time: _____
-
-Actual time needed to complete: _____
-
-
-## WWRC
-
-[WWRC](./img/WRRC.jpg)
-
-  ** This screenshot is not right. Will get it updated. **
+![WRRC](./img/wrrc.png)
